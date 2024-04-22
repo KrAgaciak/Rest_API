@@ -1,29 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Data.Entity;
 
 namespace Rest_API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
 
-    public class Animals : ControllerBase
+    public class Animals: ControllerBase
     {
-        private Database db1;
+        IAnimalContext context;
 
-        public Animals() {
-            db1 = Database.GetDatabase();
+        public Animals(IAnimalContext context) {
+            this.context = context;
         }
 
         [HttpGet(Name = "GetAnimals")]
-        public IEnumerable<Animal> Get()
+        public ActionResult<IEnumerable<Animal>> Get()
         {
-            return db1.Animals.ToArray();
+            
+            var sortedAnimals = context.Animals.OrderBy(a => a.AnimalName).ToList();
+            return Ok(sortedAnimals);
+            
         }
 
         [HttpGet("{Id}")]
         public Animal GetAnimalById(int animalId)
         {
             Animal a1 = null;
-            a1 = db1.Animals.Where(a => a.Id == animalId).FirstOrDefault();
+                a1 = context.Animals.Where(a => a.AnimalID == animalId).FirstOrDefault(); 
+
             return a1;
         }
 
@@ -31,32 +36,56 @@ namespace Rest_API.Controllers
         public Animal Put(string name)
         {
             Animal a = new Animal();
-            a.Name = name;
-            db1.Animals.Add(a);
+            a.AnimalName = name;
+            
+                context.Animals.Add(a);
+                context.SaveChanges();
+            
             return a;
         }
 
-        [HttpPost(Name = "ChangeAnimalAtributes")] // gdzie się przyjmuje jakie wartości 
-        public Animal Post(string name)
+        [HttpPost(Name = "ChangeAnimalAtributes")]
+        public ActionResult Post(int id, string name, string type, string color)
         {
-            Animal a = new Animal();
-            a.Name = name;
-            db1.Animals.Add(a);
-            return a;
+            Animal animal = null;
+
+                animal = context.Animals.FirstOrDefault(a => a.AnimalID == id);
+
+                if (animal != null)
+                {
+                    animal.AnimalName = name;
+                    animal.AnimalColor = color;
+                    animal.AnimalType = type;
+
+                    context.SaveChanges();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            
+            return Ok(animal);
         }
 
         [HttpDelete(Name = "DeletAnimal")]
-        public Animal Delete(int animalId)
+        public ActionResult Delete(int animalId)
         {
-            Animal a = null;
-            foreach (Animal animal in db1.Animals)
-            {
-                if (animal.Id.Equals(animalId)) { 
-                    a = animal;
-                    db1.Animals.Remove(animal);
+            Animal animal = null;
+            
+            
+                animal = context.Animals.FirstOrDefault(a => a.AnimalID == animalId);
+                if (animal != null)
+                {
+                    context.Animals.Remove(animal);
+                    context.SaveChanges();
                 }
-            }
-            return a;
+                else
+                {
+                    return NotFound();
+                }
+
+            
+            return Ok(animal);
         }
 
     }

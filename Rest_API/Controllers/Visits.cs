@@ -27,7 +27,7 @@ namespace Rest_API.Controllers
             Animal a = null;
             foreach (Animal animal in db1.Animals) 
             {
-                if (animal.Id.Equals(animalId)) { a = animal;}
+                if (animal.AnimalID.Equals(animalId)) { a = animal;}
             }
             Visit v = new Visit();
             v.VisitDate = dateOfVisit;

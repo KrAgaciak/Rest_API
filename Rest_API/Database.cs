@@ -14,10 +14,10 @@
             for (int i = 0; i < 10; i++)
             {
                 Animal a = new Animal();
-                a.Name = "A" + i;
-                a.Id = i;
-                a.FurColor = "Green";
-                a.Weight = i * 50;
+                a.AnimalName = "A" + i;
+                a.AnimalID = i;
+                a.AnimalColor = "Green";
+                //a.Weight = i * 50;
                 Animals.Add(a);
             }
         }
