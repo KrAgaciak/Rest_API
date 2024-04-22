@@ -24,12 +24,16 @@ namespace Rest_API.Controllers
         }
 
         [HttpGet("{Id}")]
-        public Animal GetAnimalById(int animalId)
+        public ActionResult GetAnimalById(int animalId)
         {
             Animal a1 = null;
                 a1 = context.Animals.Where(a => a.AnimalID == animalId).FirstOrDefault(); 
+            if (a1 == null)
+            {
+                return NotFound();
+            }
 
-            return a1;
+            return Ok(a1);
         }
 
         [HttpPut(Name = "PutAnimal")]
